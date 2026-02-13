@@ -351,6 +351,10 @@ footer {
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    min-width: 150px;
+    max-width: 150px;
+    white-space: nowrap;
+
 }
 
 .yes-btn {
@@ -661,7 +665,12 @@ footer {
     .section-title {font-size: 2rem;}
     .big-question {font-size: 2.2rem !important;}
     .button-container {flex-direction: column; align-items: center;}
-    .yes-btn, .no-btn {width: 80%; max-width: 300px;}
+   .yes-btn, .no-btn {
+        width: 80%; 
+        max-width: 300px;
+        min-width: 200px;
+
+    }
     
     .promises-container {grid-template-columns: 1fr;}
     
