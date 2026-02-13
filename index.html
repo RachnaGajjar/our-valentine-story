@@ -340,10 +340,11 @@ footer {
     gap: 2rem;
     justify-content: center;
     flex-wrap: wrap;
+    align-items: center;
 }
 
 .yes-btn, .no-btn {
-    padding: 1rem 3rem;
+    padding: 1rem 2rem;
     border: none;
     border-radius: 50px;
     font-family: 'Pacifico', cursive;
@@ -351,10 +352,13 @@ footer {
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    min-width: 150px;
-    max-width: 150px;
+    /* CRITICAL FIX: Use flex-basis and flex-shrink for consistent sizing */
+    flex: 0 0 auto;
+    width: 150px;
+    text-align: center;
     white-space: nowrap;
-
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .yes-btn {
@@ -370,13 +374,19 @@ footer {
 .no-btn {
     background: white;
     color: #9B7BA0;
-    border: 2px solid var(--lavender);
-    position: relative;
+    border: 2px solid var(--lavender) !important;
 }
 
 .no-btn:hover {
     background: var(--lavender);
     color: white;
+}
+
+/* When button is in fixed position (moving around) */
+.no-btn[style*="position: fixed"] {
+    width: 150px !important;
+    min-width: 150px !important;
+    max-width: 150px !important;
 }
 
 .response-message {
@@ -664,12 +674,29 @@ footer {
     .name {font-size: 3.5rem;}
     .section-title {font-size: 2rem;}
     .big-question {font-size: 2.2rem !important;}
-    .button-container {flex-direction: column; align-items: center;}
-   .yes-btn, .no-btn {
-        width: 80%; 
-        max-width: 300px;
-        min-width: 200px;
-
+    
+    .button-container {
+        flex-direction: column; 
+        align-items: center;
+        gap: 1.5rem;
+    }
+    
+    /* CRITICAL FIX for mobile - force same width always */
+    .yes-btn, .no-btn {
+        width: 45% !important;
+        min-width: 140px !important;
+        max-width: 180px !important;
+        flex: 0 0 auto !important;
+        padding: 1rem 1.5rem !important;
+        font-size: 1.2rem !important;
+    }
+    
+    /* When No button moves, keep the width */
+    .no-btn[style*="position: fixed"],
+    .no-btn[style*="position:fixed"] {
+        width: 140px !important;
+        min-width: 140px !important;
+        max-width: 140px !important;
     }
     
     .promises-container {grid-template-columns: 1fr;}
@@ -699,6 +726,22 @@ footer {
     .memories-row {
         gap: 1rem;
         margin-bottom: 1rem;
+    }
+    
+    /* Extra small phones - even more constrained */
+    .yes-btn, .no-btn {
+        width: 42% !important;
+        min-width: 130px !important;
+        max-width: 160px !important;
+        padding: 0.9rem 1.2rem !important;
+        font-size: 1.1rem !important;
+    }
+    
+    .no-btn[style*="position: fixed"],
+    .no-btn[style*="position:fixed"] {
+        width: 130px !important;
+        min-width: 130px !important;
+        max-width: 130px !important;
     }
 }
 </style>
@@ -992,10 +1035,10 @@ function handleYes() {
     const message = document.getElementById("responseMessage");
     const noBtn = document.getElementById("noBtn");
     
-    // Reset No button position
-    noBtn.style.position = 'relative';
-    noBtn.style.left = 'auto';
-    noBtn.style.top = 'auto';
+    // Reset No button position and remove inline styles
+    noBtn.style.position = '';
+    noBtn.style.left = '';
+    noBtn.style.top = '';
     
     message.innerHTML = "Yay! You just made my heart explode with happiness! 💖✨🎉";
     
@@ -1025,12 +1068,24 @@ function handleNo() {
 
 function moveButton() {
     const button = document.getElementById("noBtn");
-    const maxX = window.innerWidth - button.offsetWidth - 50;
-    const maxY = window.innerHeight - button.offsetHeight - 50;
     
+    // Get viewport dimensions
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    // Get button dimensions - use fixed size
+    const buttonWidth = 140;  // Fixed width for mobile
+    const buttonHeight = 50;   // Approximate height
+    
+    // Calculate safe boundaries
+    const maxX = Math.max(50, viewportWidth - buttonWidth - 50);
+    const maxY = Math.max(100, viewportHeight - buttonHeight - 100);
+    
+    // Generate random position
     const randomX = Math.random() * maxX;
     const randomY = Math.random() * maxY;
     
+    // Apply position with fixed width
     button.style.position = 'fixed';
     button.style.left = randomX + 'px';
     button.style.top = randomY + 'px';
@@ -1048,9 +1103,9 @@ window.addEventListener('scroll', function() {
     // Set a timeout to reset the button after scrolling stops
     scrollTimeout = setTimeout(function() {
         if (noBtn.style.position === 'fixed') {
-            noBtn.style.position = 'relative';
-            noBtn.style.left = 'auto';
-            noBtn.style.top = 'auto';
+            noBtn.style.position = '';
+            noBtn.style.left = '';
+            noBtn.style.top = '';
         }
     }, 100);
 });
